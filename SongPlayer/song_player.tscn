@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3 uid="uid://bwmyxvagymxba"]
+
+[ext_resource type="Script" path="res://Scripts/SongPlayer.gd" id="1_hhu3l"]
+[ext_resource type="AudioStream" uid="uid://d2ipfua8eqyig" path="res://Sounds/BassSynth.wav" id="2_5iwga"]
+
+[node name="SongPlayer" type="Node"]
+script = ExtResource("1_hhu3l")
+
+[node name="SongTimer" type="Timer" parent="."]
+wait_time = 0.5
+
+[node name="NotePlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("2_5iwga")
+
+[connection signal="timeout" from="SongTimer" to="." method="_on_song_timer_timeout"]

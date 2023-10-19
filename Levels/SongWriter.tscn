@@ -1,0 +1,29 @@
+[gd_scene load_steps=7 format=3 uid="uid://cx78f37h6hlbg"]
+
+[ext_resource type="Script" path="res://Levels/SongManager.gd" id="1_0hmmb"]
+[ext_resource type="PackedScene" uid="uid://s406s6nco01w" path="res://UI/ui.tscn" id="1_evqm5"]
+[ext_resource type="PackedScene" uid="uid://bwmyxvagymxba" path="res://SongPlayer/song_player.tscn" id="1_x5mpg"]
+[ext_resource type="AudioStream" uid="uid://d2ipfua8eqyig" path="res://Sounds/BassSynth.wav" id="2_8x8r1"]
+[ext_resource type="PackedScene" uid="uid://bi6iblpamn3jh" path="res://Levels/NoteMap.tscn" id="3_usdng"]
+[ext_resource type="AudioStream" uid="uid://cgilbteu7aqy7" path="res://Sounds/Guitar.wav" id="3_ylnpb"]
+
+[node name="SongWriter" type="Node2D"]
+script = ExtResource("1_0hmmb")
+BassAudioSample = ExtResource("2_8x8r1")
+GuitarAudioSample = ExtResource("3_ylnpb")
+
+[node name="SongPlayer" parent="." instance=ExtResource("1_x5mpg")]
+
+[node name="SongTiles" parent="." instance=ExtResource("3_usdng")]
+position = Vector2(111.105, 20.605)
+
+[node name="UI" parent="." instance=ExtResource("1_evqm5")]
+
+[connection signal="button_down" from="UI/HFlowContainer/PlayAllButton" to="." method="_on_play_all_button_button_down"]
+[connection signal="button_down" from="UI/HFlowContainer/PlayButton" to="." method="_on_play_button_button_down"]
+[connection signal="button_down" from="UI/HFlowContainer/StopButton" to="." method="_on_stop_button_button_down"]
+[connection signal="button_down" from="UI/VFlowContainer/GuitarButton" to="." method="_on_guitar_button_button_down"]
+[connection signal="button_down" from="UI/VFlowContainer/BassGuitar" to="." method="_on_bass_guitar_button_down"]
+[connection signal="value_changed" from="UI/HSlider" to="." method="_on_h_slider_value_changed"]
+
+[editable path="UI"]

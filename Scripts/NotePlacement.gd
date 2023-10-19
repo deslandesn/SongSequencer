@@ -2,22 +2,34 @@ extends TileMap
 
 var GridWidth = 15
 var GridHeight = 9
-var Dic = {}
-var prevCell
+var prevCell:Vector2i
+@export var audioSample:AudioStream
 var currentSongSheet:SongSheet
 
 func _ready():
-	currentSongSheet = SongSheet.new(GridWidth,GridHeight)
+	$AudioPreview.stream = audioSample
+	currentSongSheet = SongSheet.new(GridWidth,GridHeight,audioSample)
 	for x in currentSongSheet.length:
 		for y in currentSongSheet.height:
 			currentSongSheet.SetNote(x,y,false)
 			set_cell(0,Vector2(x,y), 0, Vector2i(0,0),0)
 			
+func LoadSongsheet(newSongSheet:SongSheet):
+	currentSongSheet = newSongSheet
+	$AudioPreview.stream = currentSongSheet.audio
+	GridWidth = newSongSheet.length;
+	GridHeight = newSongSheet.height;
+	for x in currentSongSheet.length:
+		for y in currentSongSheet.height:
+			set_cell(1,Vector2(x,y), 0, Vector2i(0,0),0)
+			if(currentSongSheet.IsValidNote(x,y)):
+				set_cell(1,Vector2(x,y), 1, Vector2i(0,0),0)
 
 func _process(delta):
-	var tile = local_to_map(get_global_mouse_position())
+	var tile = local_to_map(get_local_mouse_position())
 	
-	if prevCell:
+	# clear previous cell
+	if tile!=prevCell:
 		set_cell(2,prevCell, -1, Vector2i(0,0),0)
 		
 	prevCell = tile;
@@ -35,13 +47,10 @@ func _process(delta):
 			set_cell(1,tile, 0, Vector2i(0,0),0)
 			currentSongSheet.SetNote(tile.x,tile.y,false)
 
-func _checkIfInGrid(position:Vector2):
-	if position.x < GridWidth && position.y < GridHeight:
+func _checkIfInGrid(inPosition:Vector2):
+	if inPosition.x < GridWidth && inPosition.x >= 0 && inPosition.y < GridHeight && inPosition.y >= 0:
 		return true
 	return false
-
-func _on_play_song_button_down():
-	$"../SongPlayer".PlaySong(currentSongSheet)
 	
 func playNotePreview(note:int):
 	var pitch = pow(2, note/12.0)

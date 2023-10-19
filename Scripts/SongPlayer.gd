@@ -1,35 +1,65 @@
 extends Node
 
-@export var audio:AudioStream
-var songSheet:SongSheet
-var currPos:int = 1
+var songSheets = []
 var soundPlayers = []
 
-func PlaySong(newSong:SongSheet):
-	songSheet = newSong
-	initAudioPlayers()
-	currPos = 0
-	$SongTimer.wait_time = songSheet.BPM
+var songSheet:SongSheet
+var currPos:int = 0
+var nps:float = 1
+# Songsheet : soundPlayerArrayIndex
+#var soundDictionary = {}
+
+func AddSong(newSong:SongSheet):
+	songSheets.Append(newSong)
+	
+func PlaySongs(allSheets):
+	print("Playing all")
+	for i in allSheets:
+		print("Song sheet added")
+	songSheets = allSheets
+	initAllAudioSongs()
+	$SongTimer.wait_time = 1 / nps
 	$SongTimer.start()
+	
+func setNotePerSecond(newNPS:int):
+	nps = newNPS
 
-func initAudioPlayers():
-	for i in songSheet.height:
-		var aPlayer = AudioStreamPlayer.new()
-		aPlayer.stream = audio
-		aPlayer.pitch_scale = pow(2, i/12.0)
-		add_child(aPlayer)
-		soundPlayers.append(aPlayer)
-
+func initAllAudioSongs():
+	soundPlayers = []
+	for i in songSheets.size():
+		
+		print("song")
+		var currSongSheet = songSheets[i]
+		var soundPlayerArray = []
+		for x in currSongSheet.height:
+			var aPlayer = AudioStreamPlayer.new()
+			aPlayer.stream = currSongSheet.audio
+			aPlayer.pitch_scale = pow(2, x/12.0)
+			add_child(aPlayer)
+			soundPlayerArray.append(aPlayer)
+		soundPlayers.append(soundPlayerArray)
+		
 func _on_song_timer_timeout():
-	var notes = songSheet.GetNotesAtBar(currPos)
-	for key in notes:
-		var playable = notes[key]["Selected"]
-		print(notes[key])
-		if playable:
-			playNote(key)
+	print("Tick")
+	var trackEnd = true
+	for song in songSheets.size():
+		if songSheets[song].length > currPos:
+			trackEnd = false
+		else:
+			continue
+				
+		var notes = songSheets[song].GetNotesAtBar(currPos)
+		for key in notes.size():
+			var playable = notes[key]["Selected"]
+			if playable:
+				soundPlayers[song][key].play()
 	currPos = currPos + 1
-	if(songSheet.length-1 < currPos):
-		$SongTimer.stop()
-
+	if trackEnd:
+		StopSong()	
+		
+func StopSong():
+	$SongTimer.stop()
+	currPos = 0	
+	
 func playNote(note:int):
 	soundPlayers[note].play()
